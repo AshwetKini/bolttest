@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument from 'pdfkit';
 import { Order } from '../../orders/schemas/order.schema';
 
 @Injectable()
@@ -26,19 +26,22 @@ export class PdfService {
 
       // Store Info
       doc
+        .fontSize(12)
         .text('Store Information:', 50, 200)
-        .text(`Store: ${order.store.name}`, 50, 220)
-        .text(`Phone: ${order.store.phone}`, 50, 240);
+        .text(`Store: ${order['store']?.name || ''}`, 50, 220)
+        .text(`Phone: ${order['store']?.phone || ''}`, 50, 240);
 
       // Customer Info
       doc
+        .fontSize(12)
         .text('Customer Information:', 300, 200)
-        .text(`Name: ${order.customer.name}`, 300, 220)
-        .text(`Phone: ${order.customer.phone}`, 300, 240);
+        .text(`Name: ${order['customer']?.name || ''}`, 300, 220)
+        .text(`Phone: ${order['customer']?.phone || ''}`, 300, 240);
 
       // Items table
       let yPosition = 300;
       doc
+        .fontSize(12)
         .text('Items:', 50, yPosition)
         .text('Item', 50, yPosition + 20)
         .text('Qty', 200, yPosition + 20)
@@ -48,7 +51,7 @@ export class PdfService {
       yPosition += 40;
       let subtotal = 0;
 
-      order.items.forEach((item) => {
+      order.items.forEach((item: any) => {
         const itemTotal = item.quantity * item.price;
         subtotal += itemTotal;
 
@@ -64,15 +67,15 @@ export class PdfService {
       // Totals
       yPosition += 20;
       doc
+        .fontSize(12)
         .text(`Subtotal: $${subtotal.toFixed(2)}`, 250, yPosition)
         .text(`Tax: $${order.tax.toFixed(2)}`, 250, yPosition + 20)
-        .text(`Total: $${order.totalAmount.toFixed(2)}`, 250, yPosition + 40, {
-          fontSize: 14,
-          fontWeight: 'bold',
-        });
+        .fontSize(14)
+        .text(`Total: $${order.totalAmount.toFixed(2)}`, 250, yPosition + 40);
 
       // Payment Status
       doc
+        .fontSize(12)
         .text(`Payment Status: ${order.paymentStatus}`, 50, yPosition + 80)
         .fontSize(10)
         .text('Thank you for your business!', 50, yPosition + 120);

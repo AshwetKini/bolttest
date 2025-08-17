@@ -18,19 +18,22 @@ export class OrdersService {
     private pdfService: PdfService,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, user: any): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, user: any): Promise<OrderDocument> {
     const orderNumber = this.generateOrderNumber();
 
     // Calculate totals
-    const subtotal = createOrderDto.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-    const tax = subtotal * (createOrderDto.taxRate || 0) / 100;
+    const subtotal = createOrderDto.items.reduce(
+      (sum, item) => sum + item.quantity * item.price,
+      0,
+    );
+    const tax = subtotal * ((createOrderDto.taxRate || 0) / 100);
     const totalAmount = subtotal + tax - (createOrderDto.discount || 0);
 
     const order = new this.orderModel({
       orderNumber,
       storeId: createOrderDto.storeId,
       customerId: createOrderDto.customerId,
-      items: createOrderDto.items.map(item => ({
+      items: createOrderDto.items.map((item) => ({
         ...item,
         total: item.quantity * item.price,
       })),
@@ -47,7 +50,7 @@ export class OrdersService {
     return order.save();
   }
 
-  async findAll(user: any, query: any = {}): Promise<Order[]> {
+  async findAll(user: any, query: any = {}): Promise<OrderDocument[]> {
     let filter: any = {};
 
     // Role-based filtering (store owners see only their store's orders)
@@ -73,15 +76,12 @@ export class OrdersService {
     return orders;
   }
 
-  async findOne(id: string, user: any): Promise<Order> {
+  async findOne(id: string, user: any): Promise<OrderDocument> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid order ID');
     }
 
-    const order = await this.orderModel
-      .findById(id)
-      .populate('storeId', 'name phone address')
-      .populate('customerId', 'name phone email address');
+    const order = await this.orderModel.findById(id);
 
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -90,22 +90,25 @@ export class OrdersService {
     // Authorization check for store owners
     if (user.role === 'store_owner') {
       const userStoreIds = await this.getUserStoreIds(user._id);
-      if (!userStoreIds.some(storeId => storeId.equals(order.storeId))) {
+      if (!userStoreIds.some((storeId) => storeId.equals(order.storeId))) {
         throw new ForbiddenException('Access denied');
       }
     }
 
+    await order.populate('storeId', 'name phone address email');
+    await order.populate('customerId', 'name phone address email');
+
     return order;
   }
 
-  async update(id: string, updateOrderDto: UpdateOrderDto, user: any): Promise<Order> {
+  async update(id: string, updateOrderDto: UpdateOrderDto, user: any): Promise<OrderDocument> {
     const order = await this.findOne(id, user);
 
     Object.assign(order, updateOrderDto);
     return order.save();
   }
 
-  async updatePaymentStatus(id: string, paymentStatus: string, user: any): Promise<Order> {
+  async updatePaymentStatus(id: string, paymentStatus: string, user: any): Promise<OrderDocument> {
     const order = await this.findOne(id, user);
 
     const validStatuses = ['pending', 'paid', 'failed', 'refunded'];
@@ -129,7 +132,9 @@ export class OrdersService {
 
   private generateOrderNumber(): string {
     const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const random = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0');
     return `ORD-${timestamp.slice(-8)}${random}`;
   }
 
