@@ -1,0 +1,62 @@
+{
+  "name": "shopee-monorepo",
+  "version": "1.0.0",
+  "description": "Shopee E-commerce Platform - Full Stack Monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "admin",
+    "mobile"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:backend && npm run install:admin && npm run install:mobile",
+    "install:backend": "npm install --workspace=backend",
+    "install:admin": "npm install --workspace=admin",
+    "install:mobile": "npm install --workspace=mobile",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:admin": "npm run dev --workspace=admin",
+    "dev:mobile": "npm run start --workspace=mobile",
+    "build:backend": "npm run build --workspace=backend",
+    "build:admin": "npm run build --workspace=admin",
+    "build:mobile": "npm run build --workspace=mobile",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "seed": "npm run seed --workspace=backend",
+    "start:all": "./scripts/start-all.sh"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/shopee-monorepo.git"
+  },
+  "author": "Your Organization",
+  "license": "MIT",
+  "dependencies": {
+    "vite": "6.3.5"
+  }
+}

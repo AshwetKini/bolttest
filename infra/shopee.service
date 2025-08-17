@@ -1,0 +1,29 @@
+[Unit]
+Description=Shopee Backend API
+Documentation=https://github.com/your-org/shopee-monorepo
+After=network.target
+
+[Service]
+Type=simple
+User=shopee
+WorkingDirectory=/home/shopee/shopee/backend
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node dist/main.js
+Restart=on-failure
+RestartSec=10
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStopSec=5
+SyslogIdentifier=shopee-backend
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/home/shopee/shopee/backend/logs
+ReadWritePaths=/home/shopee/shopee/backend/uploads
+
+[Install]
+WantedBy=multi-user.target
