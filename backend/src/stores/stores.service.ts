@@ -17,7 +17,7 @@ export class StoresService {
     @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
   ) {}
 
-  async create(createStoreDto: CreateStoreDto, user: any): Promise<Store> {
+  async create(createStoreDto: CreateStoreDto, user: any): Promise<StoreDocument> {
     const store = new this.storeModel({
       ...createStoreDto,
       ownerId: user._id,
@@ -37,7 +37,7 @@ export class StoresService {
     return store.save();
   }
 
-  async findAll(user: any, query: any = {}): Promise<Store[]> {
+  async findAll(user: any, query: any = {}): Promise<StoreDocument[]> {
     let filter: any = {};
 
     // Role-based filtering
@@ -65,7 +65,7 @@ export class StoresService {
     return stores;
   }
 
-  async findOne(id: string, user: any): Promise<Store> {
+  async findOne(id: string, user: any): Promise<StoreDocument> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid store ID');
     }
@@ -86,7 +86,7 @@ export class StoresService {
     return store;
   }
 
-  async update(id: string, updateStoreDto: UpdateStoreDto, user: any): Promise<Store> {
+  async update(id: string, updateStoreDto: UpdateStoreDto, user: any): Promise<StoreDocument> {
     const store = await this.findOne(id, user);
 
     // Only allow owner or admin to update
@@ -98,7 +98,7 @@ export class StoresService {
     return store.save();
   }
 
-  async activate(id: string, user: any): Promise<Store> {
+  async activate(id: string, user: any): Promise<StoreDocument> {
     const store = await this.findOne(id, user);
 
     // Only admins can activate/deactivate
@@ -110,7 +110,7 @@ export class StoresService {
     return store.save();
   }
 
-  async deactivate(id: string, user: any): Promise<Store> {
+  async deactivate(id: string, user: any): Promise<StoreDocument> {
     const store = await this.findOne(id, user);
 
     // Only admins can activate/deactivate
@@ -127,7 +127,7 @@ export class StoresService {
     subscriptionPlan: string,
     expiresAt: Date,
     user: any,
-  ): Promise<Store> {
+  ): Promise<StoreDocument> {
     const store = await this.findOne(id, user);
 
     // Only admins can update subscriptions
@@ -151,7 +151,7 @@ export class StoresService {
     await this.storeModel.findByIdAndDelete(id);
   }
 
-  async getStoresByOwner(ownerId: string): Promise<Store[]> {
+  async getStoresByOwner(ownerId: string): Promise<StoreDocument[]> {
     return this.storeModel.find({ ownerId, status: 'active' });
   }
 }
