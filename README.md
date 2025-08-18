@@ -1,3 +1,5 @@
+![WhatsApp Image 2025-08-18 at 10 35 43_9370d751](https://github.com/user-attachments/assets/02b3f49d-8190-401b-9785-b4a1b2cdb26b)
+
 # Shopee E-commerce Platform
 
 A production-ready e-commerce monorepo built with NestJS, React, and Expo.
